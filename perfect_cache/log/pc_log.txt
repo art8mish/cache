@@ -1,0 +1,547 @@
+PerfectCache Dump (init):
+size        : 5
+furthest_key: 0
+page_hash: 
+indexes:
+1: 2
+2: 1
+4: 0
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (4 insert):
+size        : 5
+furthest_key: 4
+page_hash: 4 
+indexes:
+1: 2
+2: 1
+4: 0
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (4):
+size        : 5
+furthest_key: 4
+page_hash: 4 
+indexes:
+1: 2
+2: 1
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (2 insert):
+size        : 5
+furthest_key: 4
+page_hash: 2 4 
+indexes:
+1: 2
+2: 1
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (2):
+size        : 5
+furthest_key: 4
+page_hash: 2 4 
+indexes:
+1: 2
+2: 3
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (1 insert):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 
+indexes:
+1: 2
+2: 3
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (1):
+size        : 5
+furthest_key: 1
+page_hash: 1 2 4 
+indexes:
+1: 6
+2: 3
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 2
+page_hash: 1 2 4 
+indexes:
+1: 6
+2: 9
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (5 insert):
+size        : 5
+furthest_key: 2
+page_hash: 1 2 4 5 
+indexes:
+1: 6
+2: 9
+4: 5
+5: 4
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (5):
+size        : 5
+furthest_key: 5
+page_hash: 1 2 4 5 
+indexes:
+1: 6
+2: 9
+4: 5
+5: 15
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (4 hit):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 
+indexes:
+1: 6
+2: 9
+4: 23
+5: 15
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (1 hit):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 
+indexes:
+1: 19
+2: 9
+4: 23
+5: 15
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (6 insert):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 6 
+indexes:
+1: 19
+2: 9
+4: 23
+5: 15
+6: 7
+9: 12
+10: 10
+
+
+PerfectCache Dump (6):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 6 
+indexes:
+1: 19
+2: 9
+4: 23
+5: 15
+6: 18
+9: 12
+10: 10
+
+
+PerfectCache Dump (3 skip):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 6 
+indexes:
+1: 19
+2: 9
+4: 23
+5: 15
+6: 18
+9: 12
+10: 10
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 4
+page_hash: 1 2 4 5 6 
+indexes:
+1: 19
+2: 11
+4: 23
+5: 15
+6: 18
+9: 12
+10: 10
+
+
+PerfectCache Dump (10 erase furthest):
+size        : 5
+furthest_key: 1
+page_hash: 1 2 5 6 
+indexes:
+1: 19
+2: 11
+4: 23
+5: 15
+6: 18
+9: 12
+10: 10
+
+
+PerfectCache Dump (10 insert):
+size        : 5
+furthest_key: 1
+page_hash: 1 2 5 6 10 
+indexes:
+1: 19
+2: 11
+4: 23
+5: 15
+6: 18
+9: 12
+10: 10
+
+
+PerfectCache Dump (10):
+size        : 5
+furthest_key: 1
+page_hash: 1 2 5 6 10 
+indexes:
+1: 19
+2: 11
+4: 23
+5: 15
+6: 18
+9: 12
+10: 16
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 1
+page_hash: 1 2 5 6 10 
+indexes:
+1: 19
+2: 13
+4: 23
+5: 15
+6: 18
+9: 12
+10: 16
+
+
+PerfectCache Dump (9 erase furthest):
+size        : 5
+furthest_key: 6
+page_hash: 2 5 6 10 
+indexes:
+1: 19
+2: 13
+4: 23
+5: 15
+6: 18
+9: 12
+10: 16
+
+
+PerfectCache Dump (9 insert):
+size        : 5
+furthest_key: 6
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 13
+4: 23
+5: 15
+6: 18
+9: 12
+10: 16
+
+
+PerfectCache Dump (9):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 13
+4: 23
+5: 15
+6: 18
+9: 26
+10: 16
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 17
+4: 23
+5: 15
+6: 18
+9: 26
+10: 16
+
+
+PerfectCache Dump (7 skip):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 17
+4: 23
+5: 15
+6: 18
+9: 26
+10: 16
+
+
+PerfectCache Dump (5 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 17
+4: 23
+5: 25
+6: 18
+9: 26
+10: 16
+
+
+PerfectCache Dump (10 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 17
+4: 23
+5: 25
+6: 18
+9: 26
+10: 24
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 6 9 10 
+indexes:
+1: 19
+2: 22
+4: 23
+5: 25
+6: 18
+9: 26
+10: 24
+
+
+PerfectCache Dump (6 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 9 10 
+indexes:
+1: 19
+2: 22
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (1 insert):
+size        : 5
+furthest_key: 9
+page_hash: 1 2 5 9 10 
+indexes:
+1: 19
+2: 22
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (1):
+size        : 5
+furthest_key: 9
+page_hash: 1 2 5 9 10 
+indexes:
+1: 21
+2: 22
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (0 skip):
+size        : 5
+furthest_key: 9
+page_hash: 1 2 5 9 10 
+indexes:
+1: 21
+2: 22
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (1 hit):
+size        : 5
+furthest_key: 9
+page_hash: 2 5 9 10 
+indexes:
+2: 22
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 2
+page_hash: 2 5 9 10 
+indexes:
+2: 28
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (4 insert):
+size        : 5
+furthest_key: 2
+page_hash: 2 4 5 9 10 
+indexes:
+2: 28
+4: 23
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (4):
+size        : 5
+furthest_key: 2
+page_hash: 2 5 9 10 
+indexes:
+2: 28
+5: 25
+9: 26
+10: 24
+
+
+PerfectCache Dump (10 hit):
+size        : 5
+furthest_key: 2
+page_hash: 2 5 9 10 
+indexes:
+2: 28
+5: 25
+9: 26
+10: 27
+
+
+PerfectCache Dump (5 hit):
+size        : 5
+furthest_key: 5
+page_hash: 2 5 9 10 
+indexes:
+2: 28
+5: 29
+9: 26
+10: 27
+
+
+PerfectCache Dump (9 hit):
+size        : 5
+furthest_key: 5
+page_hash: 2 5 10 
+indexes:
+2: 28
+5: 29
+10: 27
+
+
+PerfectCache Dump (10 hit):
+size        : 5
+furthest_key: 5
+page_hash: 2 5 
+indexes:
+2: 28
+5: 29
+
+
+PerfectCache Dump (2 hit):
+size        : 5
+furthest_key: 5
+page_hash: 5 
+indexes:
+5: 29
+
+
+PerfectCache Dump (5 hit):
+size        : 5
+furthest_key: 5
+page_hash: 
+indexes:
+
+

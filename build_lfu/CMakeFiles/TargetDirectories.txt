@@ -1,0 +1,6 @@
+/home/art8mish/kt_dz/c++/cache/build_lfu/CMakeFiles/lfu_cache.dir
+/home/art8mish/kt_dz/c++/cache/build_lfu/CMakeFiles/edit_cache.dir
+/home/art8mish/kt_dz/c++/cache/build_lfu/CMakeFiles/rebuild_cache.dir
+/home/art8mish/kt_dz/c++/cache/build_lfu/tests/CMakeFiles/cache_tests.dir
+/home/art8mish/kt_dz/c++/cache/build_lfu/tests/CMakeFiles/edit_cache.dir
+/home/art8mish/kt_dz/c++/cache/build_lfu/tests/CMakeFiles/rebuild_cache.dir
