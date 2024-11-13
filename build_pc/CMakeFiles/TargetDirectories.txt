@@ -1,6 +1,0 @@
-/home/art8mish/kt_dz/c++/cache/build_pc/CMakeFiles/pc_cache.dir
-/home/art8mish/kt_dz/c++/cache/build_pc/CMakeFiles/edit_cache.dir
-/home/art8mish/kt_dz/c++/cache/build_pc/CMakeFiles/rebuild_cache.dir
-/home/art8mish/kt_dz/c++/cache/build_pc/tests/CMakeFiles/cache_tests.dir
-/home/art8mish/kt_dz/c++/cache/build_pc/tests/CMakeFiles/edit_cache.dir
-/home/art8mish/kt_dz/c++/cache/build_pc/tests/CMakeFiles/rebuild_cache.dir

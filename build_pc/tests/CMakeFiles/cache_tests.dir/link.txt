@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/cache_tests.dir/tests.cpp.o -o cache_tests  -lgtest -lgmock -lpthread 
