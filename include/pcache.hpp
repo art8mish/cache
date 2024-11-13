@@ -10,7 +10,7 @@
 #include <algorithm>
 
 
-unsigned slow_get_page(const unsigned index) {
+unsigned slow_get_page(const unsigned& index) {
     return index;
 }
 
@@ -31,7 +31,7 @@ namespace cache
         using IndexQueue = typename std::queue<index_t>;
 
         const size_t size_ = 0;
-        page_t (*page_getter_) (key_t) = nullptr;
+        page_t (*page_getter_) (const key_t&) = nullptr;
 
         std::map<key_t, page_t> page_hash_ {};
         //std::map<key_t, IndexIt> indexes_ {};
@@ -46,7 +46,7 @@ namespace cache
         unsigned hit_cntr_  = 0;
 
     public:
-        PerfectCache(const size_t size, page_t (*page_getter)(const key_t), 
+        PerfectCache(const size_t size, page_t (*page_getter)(const key_t&), 
                      const std::vector<key_t>& keys) :
             size_{size}, page_getter_{page_getter} {
                 
@@ -92,9 +92,9 @@ namespace cache
             return;
         }
 
-        key_t calc_furthest_key() {
+        void calc_furthest_key() {
             index_t max_index  = 0;
-            key_t furthest_key = furthest_key_;
+            key_t furthest_key = 0;
             for (auto& [key, page] : page_hash_) {
                 if (!is_met(key))
                     continue;
@@ -105,8 +105,7 @@ namespace cache
                     furthest_key = key;
                 }
             }
-
-            return furthest_key;
+            furthest_key_ = furthest_key;
         }
 
         //inv: page in cache
@@ -136,12 +135,7 @@ namespace cache
                 return;
 
             page_hash_.erase(furthest_key_);
-            key_t new_furthest_key = calc_furthest_key();
-
-            if (new_furthest_key == furthest_key_)
-                furthest_key_ = 0;
-            else
-                furthest_key_ = new_furthest_key;
+            calc_furthest_key();
             return;
         }
 
@@ -149,7 +143,7 @@ namespace cache
         // #ifdef DEBUG
         // dump("key=" + std::to_string(key));
         // #endif
-        void dump(const std::string msg = ""){
+        void dump(const std::string& msg = ""){
             
             std::ofstream fout(PC_LOG_PATH, std::ios::app);
             if (!fout.is_open())

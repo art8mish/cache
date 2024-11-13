@@ -12,8 +12,7 @@ protected:
     static const size_t data_size = 12;
     cache::key_t keys_[data_size]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
 
-    static const size_t cache_size = 4;
-    cache_t cache_ {cache_size, slow_get_page};
+    cache_t cache_ {4, slow_get_page};
 
     void SetUp() {
       //data_ = new key_t[12]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};

@@ -9,7 +9,7 @@
 #include <algorithm>
 
 
-unsigned slow_get_page(const unsigned index) {
+unsigned slow_get_page(const unsigned& index) {
     return index;
 }
 
@@ -30,7 +30,7 @@ namespace cache
         using freq_t = unsigned int;
 
         const size_t size_ = 0;
-        page_t (*page_getter_) (key_t) = nullptr;
+        page_t (*page_getter_) (const key_t&) = nullptr;
 
         std::map<key_t, page_t> page_hash_;
         std::map<key_t, freq_t> freq_hash_;
@@ -42,7 +42,7 @@ namespace cache
         unsigned hit_cntr_ = 0;
 
     public:
-        LFUCache(const size_t size, page_t (*page_getter)(const key_t)) :
+        LFUCache(const size_t &size, page_t (*page_getter)(const key_t&)) :
             size_{size}, page_getter_{page_getter} {
             // if (size > MAX_CACHE_SIZE) 
             //     throw std::range_error("incorrect cache init size (> max)");
@@ -127,7 +127,7 @@ namespace cache
                     min_freq_ = elem.first;
         }
 
-        void dump(const std::string msg = "") const{
+        void dump(const std::string& msg = "") const{
 
             std::ofstream fout(LFU_LOG_PATH, std::ios::app);
             if (!fout.is_open())

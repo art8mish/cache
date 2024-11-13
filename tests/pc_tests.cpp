@@ -13,8 +13,7 @@ protected:
     std::vector<cache::key_t> keys_{1, 2, 3, 4, 1, 2, 
                                     5, 1, 2, 4, 3, 4};
 
-    static const size_t cache_size = 4;
-    cache_t cache_ {cache_size, slow_get_page, keys_};
+    cache_t cache_ {4, slow_get_page, keys_};
 
     void SetUp() {
       //data_ = new key_t[12]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
