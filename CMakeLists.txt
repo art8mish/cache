@@ -26,7 +26,6 @@ set(TESTS_PC_SRC ${TESTS_DIR}/pc_tests.cpp)
 add_compile_options(
     # -D DEBUG
     # -g
-
     -std=c++20
 
     -Werror
