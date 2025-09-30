@@ -37,7 +37,7 @@ cmake --build ./build
 * `./build/pcache`    - Perfect cache
 * `./build/pc_tests`  - Perfect cache tests
 
-> Для запуска на примерах из папки `./data`:
+> Запуск на примерах из папки `./data`:
 > ```bash
 > ./build/lfu_cache < data/004.dat
 > ```
