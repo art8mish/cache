@@ -24,9 +24,12 @@ namespace cache
         const char *PC_LOG_PATH = "logs/pc_log.txt";
 
     private:
-        // using KeyList = typename std::list<key_t>;
-        // using ListIt  = typename KeyList::iterator;
-        //using MapIt  = typename std::unordered_map<key_t, page_t>::iterator;
+        #if False
+        using KeyList = typename std::list<key_t>;
+        using ListIt  = typename KeyList::iterator;
+        using MapIt  = typename std::unordered_map<key_t, page_t>::iterator;
+        #endif
+
         using index_t = size_t;
         using IndexQueue = typename std::queue<index_t>;
 
@@ -34,13 +37,15 @@ namespace cache
         page_t (*page_getter_) (const key_t&) = nullptr;
 
         std::map<key_t, page_t> page_hash_ {};
-        //std::map<key_t, IndexIt> indexes_ {};
         std::map<key_t, IndexQueue> indexes_ {};
-        //std::unordered_set <key_t> black_list{};
-        //std::map<key_t, freq_t> freq_hash_;
-        //std::map<key_t, ListIt> key_hash_;
 
-        //std::map<freq_t, std::list<key_t>> cache_;
+        #if False
+        std::unordered_set <key_t> black_list{};
+        std::map<key_t, freq_t> freq_hash_;
+        std::map<key_t, ListIt> key_hash_;
+
+        std::map<freq_t, std::list<key_t>> cache_;
+        #endif
 
         key_t furthest_key_ = 0;
         unsigned hit_cntr_  = 0;
@@ -52,10 +57,11 @@ namespace cache
                 
                 size_t keys_amount = keys.size();
                 for (size_t i=0; i < keys_amount; i++) {
-                    if (!indexes_.contains(keys[i]))
-                        indexes_[keys[i]] = IndexQueue{};
+                    const key_t& key = keys[i];
+                    if (!indexes_.contains(key))
+                        indexes_[key] = IndexQueue{};
 
-                    indexes_[keys[i]].push(i);
+                    indexes_[key].push(i);
                 }
 
                 //erase keys, which is met once
@@ -65,11 +71,7 @@ namespace cache
                         indexes_.erase(key);
                     }
 
-                // for (auto& [key, index_q] : indexes_) {
-                //     indexes_ = 
-                // }
-
-                #ifdef DEBUG
+                #ifndef NDEBUG
                 dump("init");
                 #endif 
             }
@@ -119,7 +121,7 @@ namespace cache
 
         //inv: free space in cache
         void insert_page(const key_t& key, page_t page) {
-            if (size() == size_ || contains(key))
+            if (full() || contains(key))
                 return;
 
             page_hash_[key] = page;
@@ -140,7 +142,7 @@ namespace cache
         }
 
 
-        // #ifdef DEBUG
+        // #ifndef NDEBUG
         // dump("key=" + std::to_string(key));
         // #endif
         void dump(const std::string& msg = ""){
@@ -209,40 +211,46 @@ namespace cache
             if (contains(key)) {
                 page_t page = get_cached_page(key);
                 update_index(key);
-                #ifdef DEBUG
+
+                #ifndef NDEBUG
                 dump(std::to_string(key) + " hit");
                 #endif
+
                 return page;
             }
 
             page_t page = slow_get_page(key);
 
             if (!is_met(key)) {
-                #ifdef DEBUG
+
+                #ifndef NDEBUG
                 dump(std::to_string(key) + " skip");
                 #endif
+
                 return page;
             }
 
-            else if (full() &&
-                     next_i(key) < next_i(furthest_key_)) {
+            else if (full() && next_i(key) < next_i(furthest_key_)) {
                 erase_furthest();
-                #ifdef DEBUG
+
+                #ifndef NDEBUG
                 dump(std::to_string(key) + " erase furthest");
                 #endif
             }
 
             if (!full()) {
                 insert_page(key, page);
-                #ifdef DEBUG
+
+                #ifndef NDEBUG
                 dump(std::to_string(key) + " insert");
                 #endif
             }
             update_index(key);
 
-            #ifdef DEBUG
+            #ifndef NDEBUG
             dump(std::to_string(key));
             #endif
+
             return page;
         }
     };

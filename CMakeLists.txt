@@ -24,8 +24,8 @@ set(TESTS_PC_SRC ${TESTS_DIR}/pc_tests.cpp)
 #target_compile_features(${TARGET} cxx_std_20)
 
 add_compile_options(
-    # -D DEBUG
     # -g
+    -D NDEBUG
     -std=c++20
 
     -Werror

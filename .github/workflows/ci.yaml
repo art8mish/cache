@@ -21,17 +21,15 @@ jobs:
 
       - name: Install dependences
         run: |
-          echo "Installing dependences..."
           sudo apt update
           sudo apt install -y cmake build-essential libgtest-dev libgmock-dev
 
       - name: Build
         run: |
-          echo "Building project..."
           cmake -S ./ -B ./build
           cmake --build ./build
 
-      - name: Run tests
+      - name: LFU tests
         run: |
           ./build/lfu_tests
           ./build/pc_tests

@@ -13,7 +13,7 @@ int main() {
     std::cin >> size;
     std::cin >> keys_amount;
 
-    #ifdef DEBUG
+    #ifndef NDEBUG
     std::cout << "Perfect Cache" << std::endl;
     std::cout << "cache size: "  << size << '\n' 
               << "keys amount: " << keys_amount << std::endl;
@@ -44,7 +44,7 @@ int main() {
     std::cout <<  cache.hits() << std::endl;
     //std::cout << "runtime = " << std::clock()/1000.0 << std::endl;
     
-    #ifdef DEBUG
+    #ifndef NDEBUG
     auto duration = (std::clock() - start_time);
     std::cout << "runtime: " << duration << " us" << std::endl;
     #endif

@@ -5,7 +5,6 @@
 
 int main()
 {
-
     unsigned size = 0;
     unsigned keys_amount = 0;
 
@@ -18,14 +17,14 @@ int main()
     std::cin >> size;
     std::cin >> keys_amount;
 
-#ifdef DEBUG
+    #ifndef NDEBUG
     std::cout << "LFU Cache" << std::endl;
     std::cout << "cache size: " << size << '\n'
               << "keys amount: " << keys_amount << std::endl;
     std::cout << "cache hits: ";
 
     auto start_time = std::clock();
-#endif
+    #endif
 
     std::vector<unsigned> keys{};
     for (unsigned i = 0; i < keys_amount; i++)
@@ -48,10 +47,10 @@ int main()
 
     std::cout << cache.hits() << std::endl;
 
-#ifdef DEBUG
+    #ifndef NDEBUG
     auto duration = std::clock() - start_time;
     std::cout << "runtime: " << duration << " us" << std::endl;
-#endif
+    #endif
 
     return 0;
 }

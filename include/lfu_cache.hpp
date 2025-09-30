@@ -8,6 +8,7 @@
 #include <list>
 #include <algorithm>
 
+#include <cassert>
 
 unsigned slow_get_page(const unsigned& index) {
     return index;
@@ -20,13 +21,12 @@ namespace cache
     template <typename page_t>
     class LFUCache {
     public:
-        const char *LFU_LOG_PATH = "logs/lfuc_log.txt";
+        const char * const LFU_LOG_PATH = "logs/lfuc_log.txt";
 
     private:
         using KeyList = typename std::list<key_t>;
         using ListIt  = typename KeyList::iterator;
-        //using MapIt  = typename std::unordered_map<key_t, page_t>::iterator;
-
+        //using MapIt = typename std::unordered_map<key_t, page_t>::iterator;
         using freq_t = unsigned int;
 
         const size_t size_ = 0;
@@ -36,7 +36,7 @@ namespace cache
         std::map<key_t, freq_t> freq_hash_;
         std::map<key_t, ListIt> key_hash_;
 
-        std::map<freq_t, std::list<key_t>> cache_;
+        std::map<freq_t, KeyList> cache_;
 
         freq_t min_freq_   = 0;
         unsigned hit_cntr_ = 0;
@@ -44,18 +44,18 @@ namespace cache
     public:
         LFUCache(const size_t &size, page_t (*page_getter)(const key_t&)) :
             size_{size}, page_getter_{page_getter} {
-            // if (size > MAX_CACHE_SIZE) 
-            //     throw std::range_error("incorrect cache init size (> max)");
+        #if False
+            if (size > MAX_CACHE_SIZE) 
+                throw std::range_error("incorrect cache init size (> max)");
 
-            // size_ = size;
+            size_ = size;
+        #endif
         }
 
     private:
         //inv: page in cache
         page_t get_cached_page(const key_t& key) {
-            if (!contains(key))
-                throw std::out_of_range("key not found");
-            
+            assert(contains(key));
             freq_t& freq = freq_hash_[key];
 
             cache_[freq].erase(key_hash_[key]);
@@ -64,7 +64,6 @@ namespace cache
                 if (min_freq_ == freq)
                     min_freq_ = freq + 1;
             }
-
             freq++;
             insert_freq_key(freq, key);
 
@@ -72,22 +71,24 @@ namespace cache
             return page_hash_[key];
         }
 
-        //inv: free space in cache
+        //inv: free space in cache, page not in cache
         void insert_page(const key_t& key, page_t page) {
-            if (size() == size_ || contains(key))
-                return;
+            assert(!full() && !contains(key));
 
-            freq_hash_[key] = 1;
-            // if (!freq_hash_.contains(key))
-            //     freq_hash_[key] = 1;
-            // else 
-            //     freq_hash_[key]++;
+            freq_t start_freq = 1;
+            freq_hash_[key] = start_freq;
 
-            freq_t& freq = freq_hash_[key];
-            insert_freq_key(freq, key);
+            #if False
+            if (!freq_hash_.contains(key))
+                freq_hash_[key] = 1;
+            else 
+                freq_hash_[key]++;
+            #endif
+
+            insert_freq_key(start_freq, key);
             
-            if (freq < min_freq_ || min_freq_ == 0)
-                min_freq_ = freq;
+            if (min_freq_ == 0)
+                min_freq_ = start_freq;
 
             page_hash_[key] = page;
             return;
@@ -106,11 +107,10 @@ namespace cache
                 return;
 
             key_t& min_key = cache_[min_freq_].back();
-    
-            cache_[min_freq_].pop_back();
             key_hash_.erase(min_key);
             page_hash_.erase(min_key);
             freq_hash_.erase(min_key);
+            cache_[min_freq_].pop_back();
 
             if (cache_[min_freq_].size() == 0) {
                 cache_.erase(min_freq_);
@@ -147,7 +147,7 @@ namespace cache
                     dump_str.append(std::to_string(key) + "(" + std::to_string(page) + ") ");
             dump_str.append("\n");
 
-            dump_str.append("key_hash:");
+            dump_str.append("key_hash: ");
             for (const auto& [key, key_it] : key_hash_)
                 if (key != *key_it)
                     dump_str.append(std::to_string(key) + "(" + std::to_string(*key_it) + ") ");
@@ -189,9 +189,9 @@ namespace cache
             if (contains(key)) {
                 page_t page = get_cached_page(key);
 
-                #ifdef DEBUG
+            #ifndef NDEBUG
                 dump("key=" + std::to_string(key) + "(hit)");
-                #endif
+            #endif
                 return page;
             }
 
@@ -202,7 +202,7 @@ namespace cache
 
             insert_page(key, page);
             
-            #ifdef DEBUG
+            #ifndef NDEBUG
             dump("key=" + std::to_string(key));
             #endif
             return page;
