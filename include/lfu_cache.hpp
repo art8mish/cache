@@ -26,7 +26,6 @@ namespace cache
     private:
         using KeyList = typename std::list<key_t>;
         using ListIt  = typename KeyList::iterator;
-        //using MapIt = typename std::unordered_map<key_t, page_t>::iterator;
         using freq_t = unsigned int;
 
         const size_t size_ = 0;
@@ -43,14 +42,7 @@ namespace cache
 
     public:
         LFUCache(const size_t &size, page_t (*page_getter)(const key_t&)) :
-            size_{size}, page_getter_{page_getter} {
-        #if False
-            if (size > MAX_CACHE_SIZE) 
-                throw std::range_error("incorrect cache init size (> max)");
-
-            size_ = size;
-        #endif
-        }
+            size_{size}, page_getter_{page_getter} {}
 
     private:
         //inv: page in cache
@@ -77,13 +69,6 @@ namespace cache
 
             freq_t start_freq = 1;
             freq_hash_[key] = start_freq;
-
-            #if False
-            if (!freq_hash_.contains(key))
-                freq_hash_[key] = 1;
-            else 
-                freq_hash_[key]++;
-            #endif
 
             insert_freq_key(start_freq, key);
             
@@ -162,7 +147,6 @@ namespace cache
                 dump_str.append("\n");
             }
 
-            //std::cout << dump_str << std::endl;
             fout << dump_str << '\n' << std::endl;
             fout.close();
         }
@@ -189,9 +173,9 @@ namespace cache
             if (contains(key)) {
                 page_t page = get_cached_page(key);
 
-            #ifndef NDEBUG
+                #ifndef NDEBUG
                 dump("key=" + std::to_string(key) + "(hit)");
-            #endif
+                #endif
                 return page;
             }
 

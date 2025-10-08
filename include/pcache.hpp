@@ -24,12 +24,6 @@ namespace cache
         const char *PC_LOG_PATH = "logs/pc_log.txt";
 
     private:
-        #if False
-        using KeyList = typename std::list<key_t>;
-        using ListIt  = typename KeyList::iterator;
-        using MapIt  = typename std::unordered_map<key_t, page_t>::iterator;
-        #endif
-
         using index_t = size_t;
         using IndexQueue = typename std::queue<index_t>;
 
@@ -38,14 +32,6 @@ namespace cache
 
         std::map<key_t, page_t> page_hash_ {};
         std::map<key_t, IndexQueue> indexes_ {};
-
-        #if False
-        std::unordered_set <key_t> black_list{};
-        std::map<key_t, freq_t> freq_hash_;
-        std::map<key_t, ListIt> key_hash_;
-
-        std::map<freq_t, std::list<key_t>> cache_;
-        #endif
 
         key_t furthest_key_ = 0;
         unsigned hit_cntr_  = 0;
@@ -141,10 +127,6 @@ namespace cache
             return;
         }
 
-
-        // #ifndef NDEBUG
-        // dump("key=" + std::to_string(key));
-        // #endif
         void dump(const std::string& msg = ""){
             
             std::ofstream fout(PC_LOG_PATH, std::ios::app);
@@ -167,12 +149,8 @@ namespace cache
             dump_str.append("indexes:\n");
             for (const auto& [key, index_q] : indexes_) {
                 dump_str.append(std::to_string(key) + ": " + std::to_string(next_i(key)) + "\n");
-                // for (const auto& index : index_q)
-                //     dump_str.append(index + " ");
-                // dump_str.append("\n");
             }
-
-            //std::cout << dump_str << std::endl;
+            
             fout << dump_str << '\n' << std::endl;
             fout.close();
         }

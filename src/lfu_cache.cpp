@@ -8,12 +8,6 @@ int main()
     unsigned size = 0;
     unsigned keys_amount = 0;
 
-    // std::ifstream in("input/input.txt");
-    // if (!in.is_open()) {
-    //     std::cout << "error: incorrect input file" << std::endl;
-    //     return 1;
-    // }
-
     std::cin >> size;
     std::cin >> keys_amount;
 
@@ -33,12 +27,6 @@ int main()
         std::cin >> key;
         keys.push_back(key);
     }
-    // fin.close();
-
-    // std::cout << "keys: ";
-    //  for (unsigned& key : keys)
-    //      std::cout << key << ' ';
-    //  std::cout << std::endl;
 
     cache::LFUCache<unsigned> cache{size, slow_get_page};
 
