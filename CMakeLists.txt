@@ -53,7 +53,7 @@ add_executable(${LFU_TARGET} ${SRC_LFU})
 add_executable(${PC_TARGET}  ${SRC_PC})
 
 add_executable(${TESTS_LFU_TARGET} ${TESTS_LFU_SRC})
-target_link_libraries(${TESTS_LFU_TARGET} gtest gmock pthread)
+target_link_libraries(${TESTS_LFU_TARGET} gtest pthread)
 
 add_executable(${TESTS_PC_TARGET} ${TESTS_PC_SRC})
-target_link_libraries(${TESTS_PC_TARGET} gtest gmock pthread)
+target_link_libraries(${TESTS_PC_TARGET} gtest pthread)

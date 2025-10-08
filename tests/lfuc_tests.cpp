@@ -1,4 +1,4 @@
-#include <gmock/gmock.h>
+
 #include <gtest/gtest.h>
 #include <fstream>
 #include "../include/lfu_cache.hpp"

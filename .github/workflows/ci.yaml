@@ -22,7 +22,7 @@ jobs:
       - name: Install dependences
         run: |
           sudo apt update
-          sudo apt install -y cmake build-essential libgtest-dev libgmock-dev
+          sudo apt install -y cmake build-essential libgtest-dev
 
       - name: Build
         run: |
