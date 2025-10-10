@@ -33,7 +33,7 @@ cmake --build ./build
 
 Запуск файлов:
 * `./build/lfu_cache` - LFU cache
-* `./build/lfu_tests` - LFU cache tests
+* `./build/lfuc_tests` - LFU cache tests
 * `./build/pcache`    - Perfect cache
 * `./build/pc_tests`  - Perfect cache tests
 
@@ -45,4 +45,4 @@ cmake --build ./build
 
 ## Отладка
 
-Чтобы скомпилировать программы в режиме отладки, следует закомментировать строчку `-D NDEBUG` и расскоментировать `-g` в *CMakeLists.txt* и повторить процесс компиляции. Все логи сохраняются в папке **./logs/**.
+Чтобы скомпилировать программы в режиме отладки, следует скомпилировать без флага `-D NDEBUG` (закомментровать этот флаг в *CMakeLists.txt* и повторить процесс компиляции). Все логи по умолчанию сохраняются в папке **./logs/**, изменить путь логирования можно через переменные LFU_LOG_PATH и PC_LOG_PATH для каждого из кешей соответственно.

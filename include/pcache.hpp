@@ -8,24 +8,14 @@
 #include <string>
 #include <vector>
 
-unsigned slow_get_page(const unsigned &index) {
-    return index;
-}
-
 namespace cache {
-using key_t = unsigned int;
+std::string PC_LOG_PATH{"logs/lfuc_log.txt"};
 
-template <typename page_t> class PerfectCache {
-public:
-    const char *PC_LOG_PATH = "logs/pc_log.txt";
-
-private:
+template <typename key_t, typename page_t> class PerfectCache {
     using index_t = size_t;
     using IndexQueue = typename std::queue<index_t>;
 
     const size_t size_ = 0;
-    page_t (*page_getter_)(const key_t &) = nullptr;
-
     std::map<key_t, page_t> page_hash_{};
     std::map<key_t, IndexQueue> indexes_{};
 
@@ -51,10 +41,6 @@ public:
                 indexes_[key].pop();
                 indexes_.erase(key);
             }
-
-#ifndef NDEBUG
-        dump("init");
-#endif
     }
 
 private:

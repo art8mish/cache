@@ -1,5 +1,7 @@
 
+
 #include "lfu_cache.hpp"
+#include "api.hpp"
 
 #include <ctime>
 #include <iostream>
@@ -27,7 +29,7 @@ int main() {
         keys.push_back(key);
     }
 
-    cache::LFUCache<unsigned> lfu_cache{size, slow_get_page};
+    cache::LFUCache<unsigned, unsigned> lfu_cache{size, slow_get_page};
 
     for (unsigned &key : keys)
         lfu_cache.proc_page(key);

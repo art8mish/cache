@@ -3,25 +3,17 @@
 
 #include <fstream>
 
+#include "api.hpp"
 #include "lfu_cache.hpp"
 
 class TestLFUCache : public ::testing::Test {
 protected:
-    using cache_t = typename cache::LFUCache<unsigned>;
+    using cache_t = typename cache::LFUCache<unsigned, unsigned>;
 
     static const size_t data_size = 12;
-    cache::key_t keys_[data_size]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
+    unsigned keys_[data_size]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
 
     cache_t cache_{4, slow_get_page};
-
-    void SetUp() {
-        // data_ = new key_t[12]{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
-        // cache_ = new cache_t{5, slow_get_page};
-    }
-    void TearDown() {
-        // delete[] data_;
-        // delete cache_;
-    }
 };
 
 TEST_F(TestLFUCache, ProcPage_Size) {
@@ -50,7 +42,7 @@ TEST_F(TestLFUCache, ProcPage_Full) {
 TEST_F(TestLFUCache, ProcPage_Contains) {
     ASSERT_EQ(false, cache_.contains(0)); // init
 
-    cache::key_t in_contains[data_size]{0, 2, 3, 2, 5, 4, 3, 2, 4, 5, 5, 3};
+    unsigned in_contains[data_size]{0, 2, 3, 2, 5, 4, 3, 2, 4, 5, 5, 3};
     bool out_contains[data_size]{false, true, true, true, false, true,
                                  false, true, true, true, false, true};
 
@@ -72,9 +64,9 @@ TEST_F(TestLFUCache, ProcPage_Hits) {
 }
 
 TEST(LFUCacheDataTests, DATA_004) {
-    cache::LFUCache<unsigned> cache{5, slow_get_page};
-    cache::key_t keys[30]{4, 2,  1, 2, 5, 4, 1, 6, 3, 2,  10, 2, 9,  2, 7,
-                          5, 10, 2, 6, 1, 0, 1, 2, 4, 10, 5,  9, 10, 2, 5};
+    cache::LFUCache<unsigned, unsigned> cache{5, slow_get_page};
+    unsigned keys[30]{4, 2,  1, 2, 5, 4, 1, 6, 3, 2,  10, 2, 9,  2, 7,
+                      5, 10, 2, 6, 1, 0, 1, 2, 4, 10, 5,  9, 10, 2, 5};
     for (auto &key : keys)
         cache.proc_page(key);
 

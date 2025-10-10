@@ -1,5 +1,6 @@
 
 #include "pcache.hpp"
+#include "api.hpp"
 
 #include <ctime>
 
@@ -25,7 +26,7 @@ int main() {
         keys.push_back(key);
     }
 
-    cache::PerfectCache<unsigned> pc_cache{size, slow_get_page, keys};
+    cache::PerfectCache<unsigned, unsigned> pc_cache{size, slow_get_page, keys};
     for (unsigned &key : keys)
         pc_cache.proc_page(key);
 

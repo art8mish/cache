@@ -31,7 +31,7 @@ jobs:
 
       - name: LFU tests
         run: |
-          ./build/lfu_tests
+          ./build/lfuc_tests
           ./build/pc_tests
 
       - name: Show date

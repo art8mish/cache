@@ -8,25 +8,15 @@
 #include <map>
 #include <string>
 
-unsigned slow_get_page(const unsigned &index) {
-    return index;
-}
-
 namespace cache {
-using key_t = unsigned int;
+std::string LFU_LOG_PATH{"logs/lfuc_log.log"};
 
-template <typename page_t> class LFUCache {
-public:
-    const char *const LFU_LOG_PATH = "logs/lfuc_log.txt";
-
-private:
+template <typename key_t, typename page_t> class LFUCache {
     using KeyList = typename std::list<key_t>;
     using ListIt = typename KeyList::iterator;
     using freq_t = unsigned int;
 
     const size_t size_ = 0;
-    page_t (*page_getter_)(const key_t &) = nullptr;
-
     std::map<key_t, page_t> page_hash_;
     std::map<key_t, freq_t> freq_hash_;
     std::map<key_t, ListIt> key_hash_;
