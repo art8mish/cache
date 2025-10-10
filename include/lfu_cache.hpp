@@ -27,6 +27,7 @@ template <typename key_t, typename page_t> class LFUCache {
     std::map<freq_t, KeyList> cache_;
 
     freq_t min_freq_ = 0;
+
 public:
     LFUCache(const size_t &size, page_t (*page_getter)(const key_t &))
         : size_{size}, page_getter_{page_getter} {

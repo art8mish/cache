@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <unordered_map>
 #include <queue>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace cache {
@@ -156,8 +156,6 @@ public:
         return page_hash_.size();
     }
 
-    
-
     bool lookup_update(const key_t &key) {
         if (contains(key)) {
             [[maybe_unused]] page_t page = get_cached_page(key);
@@ -167,7 +165,7 @@ public:
             dump(std::to_string(key) + " hit");
 #endif
             return true; // hit
-            //return page;
+            // return page;
         }
 
         [[maybe_unused]] page_t page = page_getter_(key);
@@ -177,7 +175,7 @@ public:
             dump(std::to_string(key) + " skip");
 #endif
             return false; // not hit
-            //return page;
+            // return page;
         }
 
         else if (full() && next_i(key) < next_i(furthest_key_)) {
@@ -201,7 +199,7 @@ public:
         dump(std::to_string(key));
 #endif
         return false; // not hit
-        //return page;
+        // return page;
     }
 };
 } // namespace cache
