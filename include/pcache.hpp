@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <queue>
 #include <string>
 #include <vector>
@@ -19,11 +19,10 @@ template <typename key_t, typename page_t> class PerfectCache {
     const size_t size_ = 0;
     page_t (*page_getter_)(const key_t &) = nullptr;
 
-    std::map<key_t, page_t> page_hash_{};
-    std::map<key_t, IndexQueue> indexes_{};
+    std::unordered_map<key_t, page_t> page_hash_{};
+    std::unordered_map<key_t, IndexQueue> indexes_{};
 
     key_t furthest_key_ = 0;
-    unsigned hit_cntr_ = 0;
 
 public:
     PerfectCache(const size_t size, page_t (*page_getter)(const key_t &),
@@ -84,8 +83,6 @@ private:
     page_t get_cached_page(const key_t &key) {
         if (!contains(key))
             throw std::out_of_range("get_cached_page: key not found");
-
-        hit_cntr_++;
         return page_hash_[key];
     }
 
@@ -147,10 +144,6 @@ private:
     }
 
 public:
-    unsigned hits() const {
-        return hit_cntr_;
-    }
-
     bool contains(const key_t &key) const {
         return page_hash_.contains(key);
     }
@@ -163,26 +156,28 @@ public:
         return page_hash_.size();
     }
 
-    page_t proc_page(const key_t &key) {
+    
+
+    bool lookup_update(const key_t &key) {
         if (contains(key)) {
-            page_t page = get_cached_page(key);
+            [[maybe_unused]] page_t page = get_cached_page(key);
             update_index(key);
 
 #ifndef NDEBUG
             dump(std::to_string(key) + " hit");
 #endif
-
-            return page;
+            return true; // hit
+            //return page;
         }
 
-        page_t page = page_getter_(key);
+        [[maybe_unused]] page_t page = page_getter_(key);
 
         if (!is_met(key)) {
 #ifndef NDEBUG
             dump(std::to_string(key) + " skip");
 #endif
-
-            return page;
+            return false; // not hit
+            //return page;
         }
 
         else if (full() && next_i(key) < next_i(furthest_key_)) {
@@ -205,8 +200,8 @@ public:
 #ifndef NDEBUG
         dump(std::to_string(key));
 #endif
-
-        return page;
+        return false; // not hit
+        //return page;
     }
 };
 } // namespace cache

@@ -26,11 +26,13 @@ int main() {
         keys.push_back(key);
     }
 
-    cache::PerfectCache<unsigned, unsigned> pc_cache{size, slow_get_page, keys};
+    cache::PerfectCache<unsigned, unsigned> pc_cache{size, slow_lookup_update, keys};
+    size_t hits = 0;
     for (unsigned &key : keys)
-        pc_cache.proc_page(key);
+        if (pc_cache.lookup_update(key) == true)
+            hits++;
 
-    std::cout << pc_cache.hits() << std::endl;
+    std::cout << hits << std::endl;
 
 #ifndef NDEBUG
     auto duration = (std::clock() - start_time);

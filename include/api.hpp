@@ -1,3 +1,3 @@
 #pragma once
 
-unsigned slow_get_page(const unsigned &index);
+unsigned slow_lookup_update(const unsigned &index);

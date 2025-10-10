@@ -29,12 +29,13 @@ int main() {
         keys.push_back(key);
     }
 
-    cache::LFUCache<unsigned, unsigned> lfu_cache{size, slow_get_page};
-
+    cache::LFUCache<unsigned, unsigned> lfu_cache{size, slow_lookup_update};
+    size_t hits = 0;
     for (unsigned &key : keys)
-        lfu_cache.proc_page(key);
+        if (lfu_cache.lookup_update(key) == true)
+            hits++;
 
-    std::cout << lfu_cache.hits() << std::endl;
+    std::cout << hits << std::endl;
 
 #ifndef NDEBUG
     auto duration = std::clock() - start_time;

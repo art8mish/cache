@@ -27,8 +27,6 @@ template <typename key_t, typename page_t> class LFUCache {
     std::map<freq_t, KeyList> cache_;
 
     freq_t min_freq_ = 0;
-    unsigned hit_cntr_ = 0;
-
 public:
     LFUCache(const size_t &size, page_t (*page_getter)(const key_t &))
         : size_{size}, page_getter_{page_getter} {
@@ -49,7 +47,6 @@ private:
         freq++;
         insert_freq_key(freq, key);
 
-        hit_cntr_++;
         return page_hash_[key];
     }
 
@@ -138,10 +135,6 @@ private:
     }
 
 public:
-    unsigned hits() const {
-        return hit_cntr_;
-    }
-
     bool contains(const key_t &key) const {
         return page_hash_.contains(key);
     }
@@ -154,17 +147,16 @@ public:
         return page_hash_.size();
     }
 
-    page_t proc_page(const key_t &key) {
+    page_t lookup_update(const key_t &key) {
         if (contains(key)) {
-            page_t page = get_cached_page(key);
-
+            [[maybe_unused]] page_t page = get_cached_page(key);
 #ifndef NDEBUG
             dump("key=" + std::to_string(key) + "(hit)");
 #endif
-            return page;
+            return true; // hit
         }
 
-        page_t page = page_getter_(key);
+        [[maybe_unused]] page_t page = page_getter_(key);
 
         if (full())
             erase_lfu();
@@ -174,7 +166,7 @@ public:
 #ifndef NDEBUG
         dump("key=" + std::to_string(key));
 #endif
-        return page;
+        return false; // not hit
     }
 };
 } // namespace cache

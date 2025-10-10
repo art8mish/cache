@@ -13,7 +13,7 @@ protected:
     static const size_t data_size = 12;
     std::vector<unsigned> keys_{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
 
-    cache_t cache_{4, slow_get_page, keys_};
+    cache_t cache_{4, slow_lookup_update, keys_};
 };
 
 TEST_F(TestPerfectCache, ProcPage_Size) {
@@ -22,7 +22,7 @@ TEST_F(TestPerfectCache, ProcPage_Size) {
     size_t out_size[data_size]{1, 2, 3, 4, 4, 4, 4, 3, 2, 2, 1, 0};
 
     for (unsigned i = 0; i < data_size; i++) {
-        cache_.proc_page(keys_[i]);
+        cache_.lookup_update(keys_[i]);
         ASSERT_EQ(out_size[i], cache_.size());
     }
 }
@@ -34,7 +34,7 @@ TEST_F(TestPerfectCache, ProcPage_Full) {
                              true,  false, false, false, false, false};
 
     for (unsigned i = 0; i < data_size; i++) {
-        cache_.proc_page(keys_[i]);
+        cache_.lookup_update(keys_[i]);
         ASSERT_EQ(out_full[i], cache_.full());
     }
 }
@@ -47,31 +47,33 @@ TEST_F(TestPerfectCache, ProcPage_Contains) {
                                  true,  false, false, true, false, false};
 
     for (unsigned i = 0; i < data_size; i++) {
-        cache_.proc_page(keys_[i]);
+        cache_.lookup_update(keys_[i]);
         ASSERT_EQ(out_contains[i], cache_.contains(in_contains[i]));
     }
 }
 
 TEST_F(TestPerfectCache, ProcPage_Hits) {
-    ASSERT_EQ(0, cache_.hits()); // init
-
     size_t out_hits[data_size]{0, 0, 0, 0, 1, 2, 2, 3, 4, 5, 6, 7};
 
+    size_t hits = 0;
     for (unsigned i = 0; i < data_size; i++) {
-        cache_.proc_page(keys_[i]);
-        ASSERT_EQ(out_hits[i], cache_.hits());
+        if (cache_.lookup_update(keys_[i]) == true)
+            hits++;
+        ASSERT_EQ(out_hits[i], hits);
     }
 }
 
 TEST(LFUCacheDataTests, DATA_004) {
     std::vector<unsigned> keys{4, 2,  1, 2, 5, 4, 1, 6, 3, 2,  10, 2, 9,  2, 7,
                                5, 10, 2, 6, 1, 0, 1, 2, 4, 10, 5,  9, 10, 2, 5};
-    cache::PerfectCache<unsigned, unsigned> cache{5, slow_get_page, keys};
+    cache::PerfectCache<unsigned, unsigned> cache{5, slow_lookup_update, keys};
 
+    size_t hits = 0;
     for (auto &key : keys)
-        cache.proc_page(key);
+        if (cache.lookup_update(key) == true)
+            hits++;
 
-    ASSERT_EQ(18, cache.hits());
+    ASSERT_EQ(18, hits);
 }
 
 int main(int argc, char *argv[]) {
