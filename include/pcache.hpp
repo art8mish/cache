@@ -9,6 +9,7 @@
 #include <vector>
 
 namespace cache {
+
 std::string PC_LOG_PATH{"logs/lfuc_log.txt"};
 
 template <typename key_t, typename page_t> class PerfectCache {
@@ -16,6 +17,8 @@ template <typename key_t, typename page_t> class PerfectCache {
     using IndexQueue = typename std::queue<index_t>;
 
     const size_t size_ = 0;
+    page_t (*page_getter_)(const key_t &) = nullptr;
+
     std::map<key_t, page_t> page_hash_{};
     std::map<key_t, IndexQueue> indexes_{};
 
@@ -112,25 +115,23 @@ private:
         if (!fout.is_open())
             return;
 
-        std::string dump_str{"PerfectCache Dump (" + msg + "):\n"};
-        dump_str.append("size        : " + std::to_string(size_) + '\n');
-        dump_str.append("furthest_key: " + std::to_string(furthest_key_) + '\n');
+        fout << "PerfectCache Dump (" + msg + "):" << std::endl;
+        fout << "size        : " + std::to_string(size_) << std::endl;
+        fout << "furthest_key: " + std::to_string(furthest_key_) << std::endl;
 
-        dump_str.append("page_hash: ");
+        fout << "page_hash: ";
         for (const auto &[key, page] : page_hash_) {
-            dump_str.append(std::to_string(key));
+            fout << std::to_string(key);
             if (key != page)
-                dump_str.append("(" + std::to_string(page) + ")");
-            dump_str.append(" ");
+                fout << "(" + std::to_string(page) + ")";
+            fout << " ";
         }
-        dump_str.append("\n");
+        fout << std::endl;
 
-        dump_str.append("indexes:\n");
+        fout << "indexes:" << std::endl;
         for (const auto &[key, index_q] : indexes_) {
-            dump_str.append(std::to_string(key) + ": " + std::to_string(next_i(key)) + "\n");
+            fout << std::to_string(key) + ": " + std::to_string(next_i(key)) << std::endl;
         }
-
-        fout << dump_str << '\n' << std::endl;
         fout.close();
     }
 
@@ -174,7 +175,7 @@ public:
             return page;
         }
 
-        page_t page = slow_get_page(key);
+        page_t page = page_getter_(key);
 
         if (!is_met(key)) {
 #ifndef NDEBUG

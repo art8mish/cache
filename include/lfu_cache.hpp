@@ -9,6 +9,7 @@
 #include <string>
 
 namespace cache {
+
 std::string LFU_LOG_PATH{"logs/lfuc_log.log"};
 
 template <typename key_t, typename page_t> class LFUCache {
@@ -17,6 +18,8 @@ template <typename key_t, typename page_t> class LFUCache {
     using freq_t = unsigned int;
 
     const size_t size_ = 0;
+    page_t (*page_getter_)(const key_t &) = nullptr;
+
     std::map<key_t, page_t> page_hash_;
     std::map<key_t, freq_t> freq_hash_;
     std::map<key_t, ListIt> key_hash_;
@@ -104,35 +107,33 @@ private:
         if (!fout.is_open())
             return;
 
-        std::string dump_str{"LFUCache Dump (" + msg + "):\n"};
-        dump_str.append("size     : " + std::to_string(size_) + '\n');
-        dump_str.append("min_freq : " + std::to_string(min_freq_) + '\n');
-        dump_str.append("freq_hash:\n");
+        fout << "LFUCache Dump (" + msg + "):" << std::endl;
+        fout << "size     : " + std::to_string(size_) << std::endl;
+        fout << "min_freq : " + std::to_string(min_freq_) << std::endl;
+        fout << "freq_hash:" << std::endl;
         for (const auto &[key, freq] : freq_hash_)
-            dump_str.append("\t" + std::to_string(key) + ": " + std::to_string(freq) + '\n');
+            fout << "\t" + std::to_string(key) + ": " + std::to_string(freq) << std::endl;
 
-        dump_str.append("page_hash: ");
+        fout << "page_hash: ";
         for (const auto &[key, page] : page_hash_)
             if (key != page)
-                dump_str.append(std::to_string(key) + "(" + std::to_string(page) + ") ");
-        dump_str.append("\n");
+                fout << std::to_string(key) + "(" + std::to_string(page) + ") ";
+        fout << std::endl;
 
-        dump_str.append("key_hash: ");
+        fout << "key_hash: ";
         for (const auto &[key, key_it] : key_hash_)
             if (key != *key_it)
-                dump_str.append(std::to_string(key) + "(" + std::to_string(*key_it) + ") ");
-        dump_str.append("\n");
+                fout << std::to_string(key) + "(" + std::to_string(*key_it) + ")";
+        fout << std::endl;
 
-        dump_str.append("cache:\n");
+        fout << "cache:" << std::endl;
         for (const auto &[freq, key_list] : cache_) {
-            dump_str.append('\t' + std::to_string(freq) + " -> ");
+            fout << '\t' + std::to_string(freq) + " -> ";
 
             for (const auto &key : key_list)
-                dump_str.append(std::to_string(key) + " ");
-            dump_str.append("\n");
+                fout << std::to_string(key) + " ";
+            fout << std::endl;
         }
-
-        fout << dump_str << '\n' << std::endl;
         fout.close();
     }
 
@@ -163,7 +164,7 @@ public:
             return page;
         }
 
-        page_t page = slow_get_page(key);
+        page_t page = page_getter_(key);
 
         if (full())
             erase_lfu();
