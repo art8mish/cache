@@ -21,7 +21,6 @@ sudo apt install -y \
     cmake \
     build-essential \
     libgtest-dev \
-    libgmock-dev
 ```
 
 Сборка проекта осуществляется следующими командами: 
