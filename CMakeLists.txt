@@ -1,106 +1,48 @@
-cmake_minimum_required(VERSION 3.28.3)
+cmake_minimum_required(VERSION 3.12)
+project(cache LANGUAGES CXX)
+enable_testing()
+ 
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(TESTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-set(TARGET cache)
-project(${TARGET})
+find_package(GTest REQUIRED)
 
-set(SRC_DIR src)
-set(INCLUDE_DIR include)
-set(TESTS_DIR tests)
+function(add_cache_exec target)
+    add_executable(${target} ${ARGN})
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIR})
+    target_compile_features(${target} PRIVATE cxx_std_20)
+    add_warnings(${target})
+endfunction()
 
-set(LFU_TARGET lfu_cache)
-set(LFU_TESTS_TARGET lfuc_tests)
-
-set(PC_TARGET pcache)
-set(PC_TESTS_TARGET pc_tests)
-
-set(SRC_LFU ${SRC_DIR}/lfu_cache.cpp ${SRC_DIR}/api.cpp)
-set(SRC_PC ${SRC_DIR}/pcache.cpp ${SRC_DIR}/api.cpp)
-set(SRC_LFU_TESTS ${TESTS_DIR}/lfuc_tests.cpp ${SRC_DIR}/api.cpp)
-set(SRC_PC_TESTS ${TESTS_DIR}/pc_tests.cpp ${SRC_DIR}/api.cpp)
+function(add_cache_test target)
+    add_executable(${target} ${ARGN})
+    target_include_directories(${target} PRIVATE ${INCLUDE_DIR})
+    target_compile_features(${target} PRIVATE cxx_std_20)
+    target_link_libraries(${target} PRIVATE GTest::gtest GTest::gtest_main)
+    add_warnings(${target})
+    add_test(NAME ${target} COMMAND ${target})
+endfunction()
 
 
-# LFU
-add_executable(${LFU_TARGET} ${SRC_LFU})
-target_include_directories(${LFU_TARGET} PRIVATE ${INCLUDE_DIR})
-target_compile_options(${LFU_TARGET} PRIVATE
-    # -g
-    -D NDEBUG
-    -std=c++20
+function(add_warnings target)
+    target_compile_options(${target} PRIVATE
+        -Werror
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wcast-align
+        -Wcast-qual
+        -Wconversion
+        -Wold-style-cast
+        -Wredundant-decls
+        -Wsign-conversion
+        -Wsign-promo
+    )
+endfunction()
 
-    -Werror
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wcast-align
-    -Wcast-qual
-    -Wconversion
-    -Wold-style-cast
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-)
+add_cache_exec(lfu_cache ${SRC_DIR}/lfu_cache.cpp)
+add_cache_exec(pcache ${SRC_DIR}/pcache.cpp)
 
-# LFU tests
-add_executable(${LFU_TESTS_TARGET} ${SRC_LFU_TESTS})
-target_include_directories(${LFU_TESTS_TARGET} PRIVATE ${INCLUDE_DIR})
-target_link_libraries(${LFU_TESTS_TARGET} PRIVATE gtest pthread)
-target_compile_options(${LFU_TESTS_TARGET} PRIVATE
-    # -g
-    -D NDEBUG
-    -std=c++20
-
-    -Werror
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wcast-align
-    -Wcast-qual
-    -Wconversion
-    -Wold-style-cast
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-)
-
-# PC
-add_executable(${PC_TARGET} ${SRC_PC})
-target_include_directories(${PC_TARGET} PRIVATE ${INCLUDE_DIR})
-target_compile_options(${PC_TARGET} PRIVATE
-    # -g
-    -D NDEBUG
-    -std=c++20
-
-    -Werror
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wcast-align
-    -Wcast-qual
-    -Wconversion
-    -Wold-style-cast
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-)
-
-# PC tests
-add_executable(${PC_TESTS_TARGET} ${SRC_PC_TESTS})
-target_include_directories(${PC_TESTS_TARGET} PRIVATE ${INCLUDE_DIR})
-target_link_libraries(${PC_TESTS_TARGET} PRIVATE gtest pthread)
-target_compile_options(${PC_TESTS_TARGET} PRIVATE
-    # -g
-    -D NDEBUG
-    -std=c++20
-
-    -Werror
-    -Wall
-    -Wextra
-    -Wpedantic
-    -Wcast-align
-    -Wcast-qual
-    -Wconversion
-    -Wold-style-cast
-    -Wredundant-decls
-    -Wsign-conversion
-    -Wsign-promo
-)
+add_cache_test(lfuc_tests ${TESTS_DIR}/lfuc_tests.cpp)
+add_cache_test(pc_tests ${TESTS_DIR}/pc_tests.cpp)

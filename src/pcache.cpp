@@ -26,10 +26,10 @@ int main() {
         keys.push_back(key);
     }
 
-    cache::PerfectCache<unsigned, unsigned> pc_cache{size, slow_lookup_update, keys};
+    cache::PerfectCache<unsigned, unsigned> pc_cache{size, keys};
     size_t hits = 0;
     for (unsigned &key : keys)
-        if (pc_cache.lookup_update(key) == true)
+        if (pc_cache.lookup_update<unsigned (*)(unsigned)>(key, slow_get_page) == true)
             hits++;
 
     std::cout << hits << std::endl;

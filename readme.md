@@ -27,22 +27,33 @@ sudo apt install -y \
 Сборка проекта осуществляется следующими командами: 
 
 ```bash
-cmake -S ./ -B ./build
-cmake --build ./build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
 Запуск файлов:
-* `./build/lfu_cache` - LFU cache
-* `./build/lfuc_tests` - LFU cache tests
-* `./build/pcache`    - Perfect cache
-* `./build/pc_tests`  - Perfect cache tests
+* `build/lfu_cache` - LFU cache
+* `build/lfuc_tests` - LFU cache tests
+* `build/pcache`    - Perfect cache
+* `build/pc_tests`  - Perfect cache tests
 
-> Запуск на примерах из папки `./data`:
-> ```bash
-> ./build/lfu_cache < data/004.dat
-> ```
+Запуск на примерах из папки `./data`:
+```bash
+./build/lfu_cache < data/004.dat
+```
+
+Запуск тестов:
+```bash
+ctest --test-dir build
+```
+
 
 
 ## Отладка
 
-Чтобы скомпилировать программы в режиме отладки, следует скомпилировать без флага `-D NDEBUG` (закомментровать этот флаг в *CMakeLists.txt* и повторить процесс компиляции). Все логи по умолчанию сохраняются в папке **./logs/**, изменить путь логирования можно через переменные LFU_LOG_PATH и PC_LOG_PATH для каждого из кешей соответственно.
+Чтобы скомпилировать программы в режиме отладки, следует скомпилировать в режиме `Debug`
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+```

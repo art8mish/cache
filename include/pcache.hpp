@@ -10,24 +10,18 @@
 
 namespace cache {
 
-std::string PC_LOG_PATH{"logs/lfuc_log.txt"};
-
 template <typename key_t, typename page_t> class PerfectCache {
     using index_t = size_t;
     using IndexQueue = typename std::queue<index_t>;
 
     const size_t size_ = 0;
-    page_t (*page_getter_)(const key_t &) = nullptr;
-
     std::unordered_map<key_t, page_t> page_hash_{};
     std::unordered_map<key_t, IndexQueue> indexes_{};
 
     key_t furthest_key_ = 0;
 
 public:
-    PerfectCache(const size_t size, page_t (*page_getter)(const key_t &),
-                 const std::vector<key_t> &keys)
-        : size_{size}, page_getter_{page_getter} {
+    PerfectCache(const size_t size, const std::vector<key_t> &keys) : size_{size} {
         size_t keys_amount = keys.size();
         for (size_t i = 0; i < keys_amount; i++) {
             const key_t &key = keys[i];
@@ -108,28 +102,23 @@ private:
     }
 
     void dump(const std::string &msg = "") {
-        std::ofstream fout(PC_LOG_PATH, std::ios::app);
-        if (!fout.is_open())
-            return;
+        std::cout << "PerfectCache Dump (" + msg + "):\n";
+        std::cout << "size        : " + std::to_string(size_) << '\n';
+        std::cout << "furthest_key: " + std::to_string(furthest_key_) << '\n';
 
-        fout << "PerfectCache Dump (" + msg + "):" << std::endl;
-        fout << "size        : " + std::to_string(size_) << std::endl;
-        fout << "furthest_key: " + std::to_string(furthest_key_) << std::endl;
-
-        fout << "page_hash: ";
+        std::cout << "page_hash: ";
         for (const auto &[key, page] : page_hash_) {
-            fout << std::to_string(key);
+            std::cout << std::to_string(key);
             if (key != page)
-                fout << "(" + std::to_string(page) + ")";
-            fout << " ";
+                std::cout << "(" + std::to_string(page) + ")";
+            std::cout << " ";
         }
-        fout << std::endl;
+        std::cout << '\n';
 
-        fout << "indexes:" << std::endl;
-        for (const auto &[key, index_q] : indexes_) {
-            fout << std::to_string(key) + ": " + std::to_string(next_i(key)) << std::endl;
-        }
-        fout.close();
+        std::cout << "indexes:\n";
+        for (const auto &[key, index_q] : indexes_)
+            std::cout << std::to_string(key) + ": " + std::to_string(next_i(key)) << '\n';
+        std::cout << std::endl;
     }
 
     bool is_met(const key_t &key) const {
@@ -156,7 +145,7 @@ public:
         return page_hash_.size();
     }
 
-    bool lookup_update(const key_t &key) {
+    template <typename getter_t> bool lookup_update(const key_t &key, getter_t page_getter) {
         if (contains(key)) {
             [[maybe_unused]] page_t page = get_cached_page(key);
             update_index(key);
@@ -168,7 +157,7 @@ public:
             // return page;
         }
 
-        [[maybe_unused]] page_t page = page_getter_(key);
+        [[maybe_unused]] page_t page = page_getter(key);
 
         if (!is_met(key)) {
 #ifndef NDEBUG

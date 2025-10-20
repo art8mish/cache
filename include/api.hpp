@@ -1,3 +1,5 @@
 #pragma once
 
-unsigned slow_lookup_update(const unsigned &index);
+inline unsigned slow_get_page(unsigned index) {
+    return index;
+}

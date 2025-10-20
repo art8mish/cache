@@ -15,9 +15,10 @@ int main() {
     std::cin >> keys_amount;
 
 #ifndef NDEBUG
-    std::cout << "LFU Cache" << std::endl;
-    std::cout << "cache size: " << size << '\n' << "keys amount: " << keys_amount << std::endl;
-    std::cout << "cache hits: ";
+    std::cout << "LFU Cache";
+    std::cout << "\ncache size: " << size;
+    std::cout << "\nkeys amount: " << keys_amount;
+    std::cout << "\ncache hits: ";
 
     auto start_time = std::clock();
 #endif
@@ -25,14 +26,18 @@ int main() {
     std::vector<unsigned> keys{};
     for (unsigned i = 0; i < keys_amount; i++) {
         unsigned key = 0;
-        std::cin >> key;
-        keys.push_back(key);
+        if (std::cin >> key)
+            keys.push_back(key);
+        else {
+            std::cout << "error: incorrect stdin" << std::endl;
+            return 1;
+        }
     }
 
-    cache::LFUCache<unsigned, unsigned> lfu_cache{size, slow_lookup_update};
+    cache::LFUCache<unsigned, unsigned> lfu_cache{size};
     size_t hits = 0;
     for (unsigned &key : keys)
-        if (lfu_cache.lookup_update(key) == true)
+        if (lfu_cache.lookup_update<unsigned (*)(unsigned)>(key, slow_get_page) == true)
             hits++;
 
     std::cout << hits << std::endl;
