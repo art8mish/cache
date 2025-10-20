@@ -22,8 +22,12 @@ int main() {
     std::vector<unsigned> keys{};
     for (unsigned i = 0; i < keys_amount; i++) {
         unsigned key = 0;
-        std::cin >> key;
-        keys.push_back(key);
+        if (std::cin >> key)
+            keys.push_back(key);
+        else {
+            std::cout << "Error: incorrect stdin" << std::endl;
+            return 1;
+        }
     }
 
     cache::PerfectCache<unsigned, unsigned> pc_cache{size, keys};

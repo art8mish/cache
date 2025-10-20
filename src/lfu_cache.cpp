@@ -29,7 +29,7 @@ int main() {
         if (std::cin >> key)
             keys.push_back(key);
         else {
-            std::cout << "error: incorrect stdin" << std::endl;
+            std::cout << "Error: incorrect stdin" << std::endl;
             return 1;
         }
     }

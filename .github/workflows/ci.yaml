@@ -26,13 +26,11 @@ jobs:
 
       - name: Build
         run: |
-          cmake -S ./ -B ./build
-          cmake --build ./build
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
 
       - name: LFU tests
-        run: |
-          ./build/lfuc_tests
-          ./build/pc_tests
+        run: ctest --test-dir build
 
       - name: Show date
         run: date
