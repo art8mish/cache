@@ -102,8 +102,8 @@ private:
         std::cout << "min_freq : " + std::to_string(min_freq_) << '\n';
         std::cout << "cache:\n";
         for (const auto &[key, node] : cache_)
-            std::cout << "\t" + std::to_string(key) + " : page " + std::to_string(node.page) +
-                             " : freq " + std::to_string(node.freq) + " : it " +
+            std::cout << "\t" + std::to_string(key) + " : freq " + std::to_string(node.freq) +
+                             " : page " + std::to_string(node.page) + " : it " +
                              std::to_string(*node.it) + '\n';
 
         std::cout << "freq_tbl:\n";
