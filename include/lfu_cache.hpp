@@ -60,10 +60,9 @@ private:
     void insert_page(const key_t &key, page_t page) {
         assert(!full());
 
-        auto [it, inserted] = cache_.emplace(key, KeyNode{.page = std::move(page),
-                                                          .freq = start_freq_,
-                                                          .it = insert_freq_key(start_freq_, key)});
-        assert(inserted == true);
+        cache_.emplace(key, KeyNode{.page = std::move(page),
+                                    .freq = start_freq_,
+                                    .it = insert_freq_key(start_freq_, key)});
 
         if (min_freq_ == 0)
             min_freq_ = start_freq_;
