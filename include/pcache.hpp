@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <queue>
@@ -15,80 +16,100 @@ template <typename key_t, typename page_t> class PerfectCache {
     using IndexQueue = typename std::queue<index_t>;
 
     const size_t size_ = 0;
-    std::unordered_map<key_t, page_t> page_hash_{};
-    std::unordered_map<key_t, IndexQueue> indexes_{};
 
-    key_t furthest_key_ = 0;
+    using PageHash = typename std::unordered_map<key_t, page_t>;
+    PageHash page_hash_{};
+
+    struct CacheNode {
+        IndexQueue indexes{};
+        PageHash::iterator page_it{};
+    };
+
+    using Cache = typename std::unordered_map<key_t, CacheNode>;
+    Cache cache_{};
+    Cache::iterator furthest_it_{};
 
 public:
-    PerfectCache(const size_t size, const std::vector<key_t> &keys) : size_{size} {
-        size_t keys_amount = keys.size();
-        for (size_t i = 0; i < keys_amount; i++) {
-            const key_t &key = keys[i];
-            if (!indexes_.contains(key))
-                indexes_[key] = IndexQueue{};
-
-            indexes_[key].push(i);
+    template <typename It> PerfectCache(const size_t size, It begin, It end) : size_{size} {
+        size_t i = 0;
+        for (It it = begin; it != end; ++it, ++i) {
+            const key_t &key = *it;
+            auto [cache_it, flg] = cache_.try_emplace(key);
+            CacheNode &node = cache_it->second;
+            node.indexes.push(i);
         }
 
         // erase keys, which is met once
-        for (const key_t &key : keys)
-            if (indexes_[key].size() == 1) {
-                indexes_[key].pop();
-                indexes_.erase(key);
-            }
+        for (auto it = cache_.begin(), end = cache_.end(); it != end;) {
+            if (it->second.indexes.size() == 1)
+                it = cache_.erase(it);
+            else
+                ++it;
+        }
+        calc_furthest_it();
     }
 
 private:
-    void update_index(const key_t &key) {
-        if (!is_met(key))
-            return;
+    bool cached(const Cache::const_iterator cache_it) const {
+        return cache_it->second.page_it != page_hash_.end();
+    }
 
-        indexes_[key].pop();
+    index_t furthest_index() const {
+        return furthest_it_->second.indexes.front();
+    }
 
-        if (indexes_[key].empty()) {
-            indexes_.erase(key);
-            page_hash_.erase(key);
-            return;
+    static index_t index(const Cache::const_iterator cache_it) {
+        return cache_it->second.indexes.front();
+    }
+
+    void try_erase_page(const Cache::const_iterator cache_it) {
+        if (cached(cache_it))
+            page_hash_.erase(cache_it->second.page_it);
+    }
+
+    void calc_furthest_it() {
+        index_t max_index = 0;
+        typename Cache::iterator furthest_it{};
+        for (auto it = cache_.begin(), end = cache_.end(); it != end; ++it) {
+            index_t i = index(it);
+            if (i > max_index) {
+                max_index = i;
+                furthest_it = it;
+            }
         }
-
-        if (next_i(key) > next_i(furthest_key_))
-            furthest_key_ = key;
+        furthest_it_ = furthest_it;
         return;
     }
 
-    void calc_furthest_key() {
-        index_t max_index = 0;
-        key_t furthest_key = 0;
-        for (auto &[key, page] : page_hash_) {
-            if (!is_met(key))
-                continue;
+    // inv: cache_it is correct
+    void update_index(Cache::iterator cache_it) {
+        assert(cache_it != cache_.end());
+        CacheNode &node = cache_it->second;
 
-            index_t index = next_i(key);
-            if (index > max_index) {
-                max_index = index;
-                furthest_key = key;
-            }
-        }
-        furthest_key_ = furthest_key;
-    }
-
-    // inv: page in cache
-    page_t get_cached_page(const key_t &key) {
-        if (!contains(key))
-            throw std::out_of_range("get_cached_page: key not found");
-        return page_hash_[key];
-    }
-
-    // inv: free space in cache
-    void insert_page(const key_t &key, page_t page) {
-        if (full() || contains(key))
+        node.indexes.pop();
+        if (node.indexes.empty()) {
+            try_erase_page(cache_it);
+            cache_.erase(cache_it);
             return;
+        }
 
-        page_hash_[key] = page;
+        if (index(cache_it) > furthest_index())
+            furthest_it_ = cache_it;
+        return;
+    }
 
-        if (size() == 1 || next_i(key) > next_i(furthest_key_))
-            furthest_key_ = key;
+    // inv: free space in cache, page is not cached and cache_it is correct
+    void insert_page(const Cache::iterator cache_it, page_t page) {
+        assert(!full());
+        assert(cache_it != cache_.end());
+        assert(!cached(cache_it));
+
+        auto [page_it, inserted] = page_hash_.emplace(cache_it->first, std::move(page));
+        assert(inserted);
+        cache_it->second.page_it = page_it;
+
+        if (furthest_it_ == cache_.end() || index(cache_it) > furthest_index())
+            furthest_it_ = cache_it;
         return;
     }
 
@@ -96,45 +117,35 @@ private:
         if (size() == 0)
             return;
 
-        page_hash_.erase(furthest_key_);
-        calc_furthest_key();
+        page_hash_.erase(furthest_it_->second.page_it);
+        calc_furthest_it();
         return;
     }
 
-    void dump(const std::string &msg = "") {
+    void dump(const std::string &msg = "") const {
         std::cout << "PerfectCache Dump (" + msg + "):\n";
+        if (cache_.empty()) {
+            std::cout << "Empty" << std::endl;
+            return;
+        }
+
         std::cout << "size        : " + std::to_string(size_) << '\n';
-        std::cout << "furthest_key: " + std::to_string(furthest_key_) << '\n';
+        std::cout << "furthest_key: " + std::to_string(furthest_it_->first) << '\n';
 
         std::cout << "page_hash: ";
-        for (const auto &[key, page] : page_hash_) {
-            std::cout << std::to_string(key);
-            if (key != page)
-                std::cout << "(" + std::to_string(page) + ")";
-            std::cout << " ";
-        }
+        for (const auto &[key, page] : page_hash_)
+            std::cout << std::to_string(key) + "(" + std::to_string(page) + ") ";
         std::cout << '\n';
 
         std::cout << "indexes:\n";
-        for (const auto &[key, index_q] : indexes_)
-            std::cout << std::to_string(key) + ": " + std::to_string(next_i(key)) << '\n';
+        for (auto it = cache_.begin(), end = cache_.end(); it != end; ++it)
+            std::cout << std::to_string(it->first) + ": " + std::to_string(index(it)) << '\n';
         std::cout << std::endl;
-    }
-
-    bool is_met(const key_t &key) const {
-        return indexes_.contains(key);
-    }
-
-    index_t next_i(const key_t &key) {
-        if (!is_met(key))
-            throw std::out_of_range("next_i: key not found");
-        index_t next_index = indexes_[key].front();
-        return next_index;
     }
 
 public:
     bool contains(const key_t &key) const {
-        return page_hash_.contains(key);
+        return cache_.contains(key);
     }
 
     bool full() const {
@@ -146,49 +157,41 @@ public:
     }
 
     template <typename getter_t> bool lookup_update(const key_t &key, getter_t page_getter) {
-        if (contains(key)) {
-            [[maybe_unused]] page_t page = get_cached_page(key);
-            update_index(key);
 
+        const auto cache_it = cache_.find(key);
+        assert(cache_it != cache_.end());
+
+        if (cached(cache_it)) {
+            update_index(cache_it);
 #ifndef NDEBUG
             dump(std::to_string(key) + " hit");
 #endif
             return true; // hit
-            // return page;
         }
 
-        [[maybe_unused]] page_t page = page_getter(key);
-
-        if (!is_met(key)) {
-#ifndef NDEBUG
-            dump(std::to_string(key) + " skip");
-#endif
-            return false; // not hit
-            // return page;
-        }
-
-        else if (full() && next_i(key) < next_i(furthest_key_)) {
+        if (full() && (index(cache_it) < furthest_index())) {
             erase_furthest();
-
 #ifndef NDEBUG
             dump(std::to_string(key) + " erase furthest");
 #endif
         }
 
-        if (!full()) {
-            insert_page(key, page);
-
+        if (full()) {
+#ifndef NDEBUG
+            dump(std::to_string(key) + " skip");
+#endif
+        } else {
+            insert_page(cache_it, page_getter(key));
 #ifndef NDEBUG
             dump(std::to_string(key) + " insert");
 #endif
         }
-        update_index(key);
 
+        update_index(cache_it);
 #ifndef NDEBUG
         dump(std::to_string(key));
 #endif
         return false; // not hit
-        // return page;
     }
 };
 } // namespace cache

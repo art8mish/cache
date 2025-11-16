@@ -9,7 +9,16 @@ int main() {
     unsigned keys_amount = 0;
 
     std::cin >> size;
+    if (!std::cin.good()) {
+        std::cout << "Error: incorrect size" << std::endl;
+        return 1;
+    }
+
     std::cin >> keys_amount;
+    if (!std::cin.good()) {
+        std::cout << "Error: incorrect keys amount" << std::endl;
+        return 1;
+    }
 
 #ifndef NDEBUG
     std::cout << "Perfect Cache" << std::endl;
@@ -22,15 +31,15 @@ int main() {
     std::vector<unsigned> keys{};
     for (unsigned i = 0; i < keys_amount; i++) {
         unsigned key = 0;
-        if (std::cin >> key)
-            keys.push_back(key);
-        else {
-            std::cout << "Error: incorrect stdin" << std::endl;
+        std::cin >> key;
+        if (!std::cin.good()) {
+            std::cout << "Error: incorrect key" << std::endl;
             return 1;
         }
+        keys.push_back(key);
     }
 
-    cache::PerfectCache<unsigned, unsigned> pc_cache{size, keys};
+    cache::PerfectCache<unsigned, unsigned> pc_cache{size, keys.begin(), keys.end()};
     size_t hits = 0;
     for (unsigned &key : keys)
         if (pc_cache.lookup_update<unsigned (*)(unsigned)>(key, slow_get_page) == true)

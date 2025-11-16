@@ -13,7 +13,7 @@ protected:
     static const size_t data_size = 12;
     std::vector<unsigned> keys_{1, 2, 3, 4, 1, 2, 5, 1, 2, 4, 3, 4};
 
-    cache_t cache_{4, keys_};
+    cache_t cache_{4, keys_.begin(), keys_.end()};
 };
 
 TEST_F(TestPerfectCache, ProcPage_Size) {
@@ -66,7 +66,7 @@ TEST_F(TestPerfectCache, ProcPage_Hits) {
 TEST(LFUCacheDataTests, DATA_004) {
     std::vector<unsigned> keys{4, 2,  1, 2, 5, 4, 1, 6, 3, 2,  10, 2, 9,  2, 7,
                                5, 10, 2, 6, 1, 0, 1, 2, 4, 10, 5,  9, 10, 2, 5};
-    cache::PerfectCache<unsigned, unsigned> cache{5, keys};
+    cache::PerfectCache<unsigned, unsigned> cache{5, keys.begin(), keys.end()};
 
     size_t hits = 0;
     for (auto &key : keys)

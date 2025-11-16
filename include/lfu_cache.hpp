@@ -21,68 +21,76 @@ template <typename key_t, typename page_t> class LFUCache {
         freq_t freq;
         KeyList::iterator it;
     };
-    std::unordered_map<key_t, KeyNode> cache_;
-    std::unordered_map<freq_t, KeyList> freq_tbl_;
+
+    using Cache = typename std::unordered_map<key_t, KeyNode>;
+    using FreqTbl = typename std::unordered_map<freq_t, KeyList>;
+
+    Cache cache_;
+    FreqTbl freq_tbl_;
 
     freq_t min_freq_ = 0;
+    static const freq_t start_freq_ = 1;
 
 public:
-    LFUCache(const size_t &size) : size_{size} {
+    LFUCache(const size_t size) : size_{size} {
     }
 
 private:
     // inv: page in cache
-    page_t get_cached_page(const key_t &key) {
-        assert(contains(key));
-        freq_t &freq = cache_[key].freq;
+    page_t get_cached_page(Cache::iterator cache_it) {
+        KeyNode &node = cache_it->second;
 
-        freq_tbl_[freq].erase(cache_[key].it);
-        if (freq_tbl_[freq].size() == 0) {
-            freq_tbl_.erase(freq);
-            if (min_freq_ == freq)
-                min_freq_ = freq + 1;
+        const auto key_list_it = freq_tbl_.find(node.freq);
+        assert(key_list_it != freq_tbl_.end());
+        KeyList &key_list = key_list_it->second;
+
+        key_list.erase(node.it);
+        if (key_list.size() == 0) {
+            freq_tbl_.erase(key_list_it);
+            if (min_freq_ == node.freq)
+                min_freq_ = node.freq + 1;
         }
-        freq++;
-        insert_freq_key(freq, key);
+        node.freq++;
+        node.it = insert_freq_key(node.freq, cache_it->first);
 
-        return cache_[key].page;
+        return node.page;
     }
 
     // inv: free space in cache, page not in cache
     void insert_page(const key_t &key, page_t page) {
-        assert(!full() && !contains(key));
+        assert(!full());
 
-        freq_t start_freq = 1;
-        cache_[key] = KeyNode{};
-        cache_[key].freq = start_freq;
-
-        insert_freq_key(start_freq, key);
+        auto [it, inserted] = cache_.emplace(key, KeyNode{.page = std::move(page),
+                                                          .freq = start_freq_,
+                                                          .it = insert_freq_key(start_freq_, key)});
+        assert(inserted == true);
 
         if (min_freq_ == 0)
-            min_freq_ = start_freq;
-
-        cache_[key].page = page;
+            min_freq_ = start_freq_;
         return;
     }
 
-    void insert_freq_key(const freq_t &freq, const key_t &key) {
-        if (!freq_tbl_.contains(freq))
-            freq_tbl_[freq] = KeyList{};
-
-        freq_tbl_[freq].push_front(key);
-        cache_[key].it = freq_tbl_[freq].begin();
+    KeyList::iterator insert_freq_key(const freq_t freq, const key_t &key) {
+        const auto [key_list_it, flg] = freq_tbl_.try_emplace(freq);
+        KeyList &key_list = key_list_it->second;
+        key_list.push_front(key);
+        return key_list.begin();
     }
 
     void erase_lfu() {
         if (size() == 0)
             return;
 
-        key_t &min_key = freq_tbl_[min_freq_].back();
-        cache_.erase(min_key);
-        freq_tbl_[min_freq_].pop_back();
+        const auto key_list_it = freq_tbl_.find(min_freq_);
+        assert(key_list_it != freq_tbl_.end());
+        KeyList &key_list = key_list_it->second;
 
-        if (freq_tbl_[min_freq_].size() == 0) {
-            freq_tbl_.erase(min_freq_);
+        key_t &min_key = key_list.back();
+        cache_.erase(min_key);
+        key_list.pop_back();
+
+        if (key_list.size() == 0) {
+            freq_tbl_.erase(key_list_it);
             min_freq_ = 0;
             update_min_freq();
         }
@@ -91,9 +99,11 @@ private:
     }
 
     void update_min_freq() {
+        freq_t freq = min_freq_;
         for (const auto &elem : freq_tbl_)
-            if (elem.first < min_freq_ || min_freq_ == 0)
-                min_freq_ = elem.first;
+            if (elem.first < freq || freq == 0)
+                freq = elem.first;
+        min_freq_ = freq;
     }
 
     void dump(const std::string &msg = "") const {
@@ -130,21 +140,19 @@ public:
         return cache_.size();
     }
 
-    template <typename getter_t> page_t lookup_update(const key_t &key, getter_t page_getter) {
-        if (contains(key)) {
-            [[maybe_unused]] page_t page = get_cached_page(key);
+    template <typename getter_t> bool lookup_update(const key_t &key, getter_t page_getter) {
+        const auto cache_it = cache_.find(key);
+        if (cache_it != cache_.end()) {
+            get_cached_page(cache_it);
 #ifndef NDEBUG
             dump("key=" + std::to_string(key) + "(hit)");
 #endif
             return true; // hit
         }
 
-        [[maybe_unused]] page_t page = page_getter(key);
-
         if (full())
             erase_lfu();
-
-        insert_page(key, page);
+        insert_page(key, page_getter(key));
 
 #ifndef NDEBUG
         dump("key=" + std::to_string(key));
